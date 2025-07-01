@@ -14,8 +14,8 @@ public interface AccountsRepository extends JpaRepository<Accounts, Long> {
 
     Optional<Accounts> findByCustomerId(Long customerId);
 
-    @Transactional
-    @Modifying
+    @Transactional //if transaction failed it will be rollback
+    @Modifying 
     void deleteByCustomerId(Long customerId);
 
 }

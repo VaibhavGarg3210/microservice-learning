@@ -18,7 +18,7 @@ import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 import com.learn.accounts.dto.ErrorResponseDto;
-
+//ResponseEntityExceptionHandler >> handleMethodArgumentNotValid 
 @ControllerAdvice
 public class GlobalExceptionHandler  extends ResponseEntityExceptionHandler {
 
@@ -36,18 +36,7 @@ public class GlobalExceptionHandler  extends ResponseEntityExceptionHandler {
         return new ResponseEntity<>(validationErrors, HttpStatus.BAD_REQUEST);
     }
 
-//    @ExceptionHandler(Exception.class)
-//    public ResponseEntity<ErrorResponseDto> handleGlobalException(Exception exception,
-//                                                                            WebRequest webRequest) {
-//        ErrorResponseDto errorResponseDTO = new ErrorResponseDto(
-//                webRequest.getDescription(false),
-//                HttpStatus.INTERNAL_SERVER_ERROR,
-//                exception.getMessage(),
-//                LocalDateTime.now()
-//        );
-//        return new ResponseEntity<>(errorResponseDTO, HttpStatus.INTERNAL_SERVER_ERROR);
-//    }
-//
+
     @ExceptionHandler(ResourceNotFoundException.class)
     public ResponseEntity<ErrorResponseDto> handleResourceNotFoundException(ResourceNotFoundException exception,
                                                                                  WebRequest webRequest) {
@@ -58,7 +47,7 @@ public class GlobalExceptionHandler  extends ResponseEntityExceptionHandler {
                 LocalDateTime.now()
         );
         return new ResponseEntity<>(errorResponseDTO, HttpStatus.NOT_FOUND);
-    }
+    }	
 //
     @ExceptionHandler(CustomerAlreadyExistsException.class)
     public ResponseEntity<ErrorResponseDto> handleCustomerAlreadyExistsException(CustomerAlreadyExistsException exception,
@@ -72,4 +61,15 @@ public class GlobalExceptionHandler  extends ResponseEntityExceptionHandler {
         return new ResponseEntity<>(errorResponseDTO, HttpStatus.BAD_REQUEST);
     }
 
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<ErrorResponseDto> handleGlobalException(Exception exception,
+    		WebRequest webRequest) {
+    	ErrorResponseDto errorResponseDTO = new ErrorResponseDto(
+    			webRequest.getDescription(false),
+    			HttpStatus.INTERNAL_SERVER_ERROR,
+    			exception.getMessage(),
+    			LocalDateTime.now()
+    			);
+    	return new ResponseEntity<>(errorResponseDTO, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
 }

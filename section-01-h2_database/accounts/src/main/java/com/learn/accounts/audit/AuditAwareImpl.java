@@ -6,6 +6,7 @@ import org.springframework.data.domain.AuditorAware;
 import org.springframework.stereotype.Component;
 
 @Component("auditAwareImpl")
+// use to add created by user when we add security then we'll add user info
 public class AuditAwareImpl implements AuditorAware<String> {
 
     /**

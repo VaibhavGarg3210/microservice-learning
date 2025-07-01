@@ -21,7 +21,7 @@ import lombok.ToString;
 @Getter @Setter @ToString
 public class BaseEntity {
 
-    @CreatedDate
+	@CreatedDate
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
 
@@ -29,12 +29,12 @@ public class BaseEntity {
     @Column(updatable = false)
     private String createdBy;
 
-    @LastModifiedDate
 //    This annotation is tell to spring don't update this column at first time
-    @Column(insertable = false)
+    @LastModifiedDate
+    @Column(name = "updated_at", insertable = false)
     private LocalDateTime updatedAt;
 
     @LastModifiedBy
-    @Column(insertable = false)
+    @Column(name = "updated_by", insertable = false)
     private String updatedBy;
 }

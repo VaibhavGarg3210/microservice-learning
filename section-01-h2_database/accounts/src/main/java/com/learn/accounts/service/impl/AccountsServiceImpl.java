@@ -112,6 +112,7 @@ public class AccountsServiceImpl  implements IAccountsService {
                 () -> new ResourceNotFoundException("Customer", "mobileNumber", mobileNumber)
         );
         accountsRepository.deleteByCustomerId(customer.getCustomerId());
+        //deleteById by default method
         customerRepository.deleteById(customer.getCustomerId());
         return true;
     }
