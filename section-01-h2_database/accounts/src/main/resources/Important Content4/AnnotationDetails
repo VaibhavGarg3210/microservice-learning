@@ -1,0 +1,9 @@
+										We are using Annotation in class in this project 
+
+	@RestController = we can use @Controller and in method we can use @ResponseBody it will work same.
+	ResponseEntity<T> = Allow Developers to send responsebody, status, and headers on the Http response
+	@ControllerAdvice -> Global Exception Logic
+	@RestControllerAdvice -> Same as RestController.
+	RequestEntity -> if we want request header and request body
+	@ResquestHeader & @RequestBody it is used to receive the request body and header individually.
+	 

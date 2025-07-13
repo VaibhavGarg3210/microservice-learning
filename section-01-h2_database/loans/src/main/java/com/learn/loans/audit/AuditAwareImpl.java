@@ -1,15 +1,11 @@
-package com.learn.accounts.audit;
-
-import java.util.Optional;
+package com.learn.loans.audit;
 
 import org.springframework.data.domain.AuditorAware;
 import org.springframework.stereotype.Component;
 
-/**
- * @author vaibhav
- */
+import java.util.Optional;
+
 @Component("auditAwareImpl")
-// use to add created by user when we add security then we'll add user info
 public class AuditAwareImpl implements AuditorAware<String> {
 
     /**
@@ -19,7 +15,7 @@ public class AuditAwareImpl implements AuditorAware<String> {
      */
     @Override
     public Optional<String> getCurrentAuditor() {
-        return Optional.of("ACCOUNTS_MS");
+        return Optional.of("LOANS_MS");
     }
 	
 }
