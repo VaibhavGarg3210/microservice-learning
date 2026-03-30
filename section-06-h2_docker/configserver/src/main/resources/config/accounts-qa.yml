@@ -1,0 +1,11 @@
+build:
+ version: "2.0"
+ 
+accounts:
+ message: "Welcome to Vaibhav accounts related QA API's"
+ contactDetails:
+  name: "Shailenser Sharma"
+  email: "Shailender3210@gmail.com"
+ onCallSupport:
+  - (XXXXXXXXXXX)
+  - (XXXXXXXXXXX)

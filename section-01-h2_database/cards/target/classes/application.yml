@@ -1,0 +1,19 @@
+server:
+ port: 9000
+spring:
+ datasource:
+  url: jdbc:h2:mem:testdb
+  driverClassName: org.h2.Driver
+  username: sa
+  password: ''
+#enalble h2 console
+ h2:
+  console:
+   enabled: true
+    
+ jpa:
+  database-plateform: org.hibernate.dialect.H2Dialect
+  hibernate:
+   ddl-auto: update
+#update mean to create table if not created and print all sql query using show-sql
+   show-sql: true

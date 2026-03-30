@@ -1,0 +1,40 @@
+services:
+ accounts:
+  image: "vaibhavg3210/accounts:microservices"
+  container_name: account-ms #if not define it automatic create
+  ports:
+   - "8080:8080"
+  deploy:
+   resources:
+    limits:
+     memory: 700m #tell max size not exceed to 700mb
+  networks:
+   - vaibhavg1280
+ 
+ loans:
+  image: "vaibhavg3210/loans:microservices"
+  container_name: loans-ms #if not define it automatic create
+  ports:
+   - "8090:8090"
+  deploy:
+   resources:
+    limits:
+     memory: 700m #tell max size not exceed to 700mb
+  networks:
+  - vaibhavg1280
+ cards:
+  image: "vaibhavg3210/cards:microservices"
+  container_name: cards-ms #if not define it automatic create
+  ports:
+   - "9000:9000"
+  deploy:
+   resources:
+    limits:
+     memory: 700m #tell max size not exceed to 700mb 
+  networks:
+   - vaibhavg1280
+   
+networks:
+ vaibhavg1280:
+  driver: "bridge"
+  

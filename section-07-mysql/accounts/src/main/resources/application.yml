@@ -1,0 +1,43 @@
+server:
+ port: 8080
+
+springdoc:
+ swagger-ui:
+  path= /swagger-ui.html
+# use h2 database on this website when server is start - http://localhost:8080/h2-console/
+spring: 
+ application:
+  name: "accounts"
+ profiles:
+  active: "prod"
+
+ datasource:
+  url: jdbc:mysql://localhost:3306/accountsdb
+  username: root
+  password: root
+      
+ jpa:
+  show-sql: true
+ sql:
+  init:
+   mode: always
+ config:
+  import: "optional:configserver:http://localhost:8071/"
+# config: 
+#  import:
+#   - "application_qa.yml"
+#   - "application_prod.yml"
+# profiles:
+#  active:
+#   - "qa"
+#build:
+# version: "3.0"
+# 
+#accounts:
+# message: "Welcome to Vaibhav accounts related local API's"
+# contactDetails:
+#  name: "Vaibhav Garg"
+#  email: "Vaibhavgarg3210@gmail.com"
+# onCallSupport:
+#  - (XXXXXXXXXXX)
+#  - (XXXXXXXXXXX)

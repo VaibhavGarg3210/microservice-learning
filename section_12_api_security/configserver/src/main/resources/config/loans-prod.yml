@@ -1,0 +1,11 @@
+build:
+ version: "1.0"
+ 
+loans:
+ message: "Welcome to Vaibhav loan related Prod API's great"
+ contactDetails:
+  name: "Ajay Sharma"
+  email: "Ajay3210@gmail.com"
+ onCallSupport:
+  - (XXXXXXXXXXX)
+  - (XXXXXXXXXXX)

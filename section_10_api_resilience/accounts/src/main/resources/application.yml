@@ -1,0 +1,121 @@
+server:
+ port: 8080
+
+springdoc:
+ swagger-ui:
+  path= /swagger-ui.html
+# use h2 database on this website when server is start - http://localhost:8080/h2-console/
+spring: 
+ application:
+  name: "accounts"
+ profiles:
+  active: "prod"
+
+ datasource:
+  url: jdbc:h2:mem:testdb
+  driverClassName: org.h2.Driver
+  username: sa
+  password: ''
+
+#enalble h2 console
+ h2:
+  console:
+   enabled: true
+  
+ jpa:
+  database-plateform: org.hibernate.dialect.H2Dialect
+  hibernate:
+   ddl-auto: update
+#update mean to create table if not created and print all sql query using show-sql
+  show-sql: true
+ config:
+  import: "optional:configserver:http://localhost:8071/"
+ cloud:
+  openfeign:
+   circuitbreaker:
+    enabled: true
+        
+eureka:
+ instance:
+  preferIpAddress: true #register as hostname
+ client:
+  fetchRegistry: true
+  registerWithEureka: true
+  serviceUrl:
+   defaultZone: http://localhost:8070/eureka/
+
+management:
+ endpoints:
+  web:
+   exposure:
+    include: "*"
+ health:
+  readiness-state:
+   enabled: true
+  liveness-state:
+   enabled: true
+ endpoint:
+  shutdown:
+   enabled: true 	#access:unrestricted 
+  health:
+   probes:
+    enabled: true
+ info:
+  env:
+   enabled: true
+   
+endpoints:
+ shutdown:
+  enabled: true
+   
+info:
+ app:
+  name: "accounts"
+  description: "Learning M.S Application"
+  version: "1.0.0"
+
+resilience4j.circuitbreaker:
+ configs:
+  default:
+   slidingWindowSize: 10 
+   permittedNumberOfCallsInHalfOpenState: 2
+   failureRateThreshold: 50
+   waitDurationInOpenState: 10000  
+
+resilience4j.retry:
+ configs:
+  default:
+   maxRetryAttemps: 3
+   waitDuration: 500
+   enableExponentialBackoff: true
+   exponentialBackoffMultiplier: 2
+   ignoreExceptions: 
+    - java.lang.NullPointerException
+   retryExceptions:
+    - java.util.concurrent.TimeoutException
+
+resilience4j.ratelimiter:
+ configs:
+  default:
+   timeoutDuration: 1000
+   limitRefreshPeriod: 5000
+   limitForPeriod: 1
+ 
+# config: 
+#  import:
+#   - "application_qa.yml"
+#   - "application_prod.yml"
+# profiles:
+#  active:
+#   - "qa"
+#build:
+# version: "3.0"
+# 
+#accounts:
+# message: "Welcome to Vaibhav accounts related local API's"
+# contactDetails:
+#  name: "Vaibhav Garg"
+#  email: "Vaibhavgarg3210@gmail.com"
+# onCallSupport:
+#  - (XXXXXXXXXXX)
+#  - (XXXXXXXXXXX)

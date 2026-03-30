@@ -1,0 +1,11 @@
+build:
+ version: "1.0"
+   
+cards:
+ message: "Welcome to Vaibhav cards great related Prod API's"
+ contactDetails:
+  name: "Ajay Sharma"
+  email: "Ajay3210@gmail.com"
+ onCallSupport:
+   - (XXXXXXXXXXX)
+   - (XXXXXXXXXXX)

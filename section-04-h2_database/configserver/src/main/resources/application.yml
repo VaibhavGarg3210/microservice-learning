@@ -1,0 +1,19 @@
+spring:
+ application:
+  name: "configserver"
+ profiles:
+  active: native # for file related use native and for git related use git
+ cloud:
+  config:
+   server:
+    native:
+     #search-locations: classpath:/config # use for same classpath
+     search-locations: "file:/home/vaibhav/Learning/Library_Microservice/microservice-learning/section-04-h2_database/configserver/src/main/resources/config"
+     #git:
+     # uri:  use for git config
+     #default-label:main you can choose branch
+     #timeout:5 after 5 sec close
+     #clone-on-start:true clone the repo file into local system when start application
+     #force-pull:true override local change it pull latest pull from master 
+server:
+ port: 8071

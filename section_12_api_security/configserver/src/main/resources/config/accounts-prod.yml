@@ -1,0 +1,11 @@
+build:
+ version: "1.0"
+ 
+accounts:
+ message: "Welcome to Vaibhav great accounts related Prod API's"
+ contactDetails:
+  name: "Ajay Sharma"
+  email: "Ajay3210@gmail.com"
+ onCallSupport:
+  - (XXXXXXXXXXX)
+  - (XXXXXXXXXXX)

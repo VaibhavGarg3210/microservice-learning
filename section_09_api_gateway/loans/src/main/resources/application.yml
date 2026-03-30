@@ -1,0 +1,69 @@
+server:
+ port: 8090
+spring:
+ application:
+  name: "loans"
+ profiles:
+  active: "prod"
+ datasource:
+  url: jdbc:h2:mem:testdb
+  driverClassName: org.h2.Driver
+  username: sa
+  password: ''
+
+#enalble h2 console
+ h2:
+  console:
+   enabled: true
+
+ jpa:
+  database-plateform: org.hibernate.dialect.H2Dialect
+  hibernate:
+   ddl-auto: update
+#update mean to create table if not created and print all sql query using show-sql
+   show-sql: true
+ config:
+  import: "optional:configserver:http://localhost:8071/"
+  
+management:
+ endpoints:
+  web:
+   exposure:
+    include: "*"
+ health:
+  readiness-state:
+   enabled: true
+ endpoint:
+  shutdown:
+   enabled: true    #access:unrestricted 
+  health:
+   probes:
+    enabled: true  
+ info:
+  env:
+   enabled: true
+       
+endpoints:
+ shutdown:
+  enabled: true
+
+eureka:
+ instance:
+  preferIpAddress: true #register as hostname
+ client:
+  fetchRegistry: true
+  registerWithEureka: true
+  serviceUrl:
+   defaultZone: http://localhost:8070/eureka/
+   
+info:
+ app:
+  name: "loans"
+  description: "Learning M.S Application"
+  version: "1.0.0"
+  
+logging:
+ level:
+  com:
+   learn:
+    loans : DEBUG
