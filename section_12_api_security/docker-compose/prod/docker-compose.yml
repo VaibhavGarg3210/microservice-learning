@@ -1,6 +1,20 @@
 services:
+ keycloak:
+  image: quay.io/keycloak/keycloak:26.4.7
+  container_name: keycloak
+  ports:
+    - "127.0.0.1:7080:8080"
+  environment:
+    KC_BOOTSTRAP_ADMIN_USERNAME: "admin"
+    KC_BOOTSTRAP_ADMIN_PASSWORD: "admin"
+  command: "start-dev"
+  extends:
+   file: common-config.yml
+   service: network-deploy-service
+   
+   
  read:
-  image: grafana/loki:2.8.3
+  image: grafana/loki:3.6.2
   command: "-config.file=/etc/loki/config.yaml -target=read"
   ports:
    - 3101:3100
@@ -20,8 +34,9 @@ services:
     aliases:
      - loki
 
+
  write:
-  image: grafana/loki:2.8.3
+  image: grafana/loki:3.6.2
   command: "-config.file=/etc/loki/config.yaml -target=write"
   ports:
    - 3102:3100
@@ -39,22 +54,36 @@ services:
   networks:
    <<: *loki-dns
 
- promtail:
-  image: grafana/promtail:2.8.3
+# promtail:
+#  image: grafana/promtail:2.8.3
+#  volumes:
+#   - ../observability/promtail/promtail-local-config.yaml:/etc/promtail/config.yaml:ro
+#   - /var/run/docker.sock:/var/run/docker.sock
+#  command: -config.file=/etc/promtail/config.yaml
+#  ports:
+#   - 12345:12345
+#  depends_on:
+#   - gateway
+#  extends:
+#   file: common-config.yml
+#   service: network-deploy-service
+
+ alloy:
+  image: grafana/alloy:v1.12.0
   volumes:
-   - ../observability/promtail/promtail-local-config.yaml:/etc/promtail/config.yaml:ro
-   - /var/run/docker.sock:/var/run/docker.sock
-  command: -config.file=/etc/promtail/config.yaml
+    - ../observability/alloy/alloy-local-config.yaml:/etc/alloy/config.alloy:ro
+    - /var/run/docker.sock:/var/run/docker.sock
+  command: run --server.http.listen-addr=0.0.0.0:12345 --storage.path=/var/lib/alloy/data /etc/alloy/config.alloy
   ports:
-   - 12345:12345
+    - 12345:12345
   depends_on:
-   - gateway
+    - gateway
   extends:
-   file: common-config.yml
-   service: network-deploy-service
+    file: common-config.yml
+    service: network-deploy-service
 
  minio:
-  image: minio/minio
+  image: minio/minio:RELEASE.2025-09-07T16-13-09Z
   entrypoint:
           - sh
           - -euc
@@ -81,7 +110,7 @@ services:
     service: network-deploy-service
 
  prometheus:
-  image: prom/prometheus:v2.45.6
+  image: prom/prometheus:v3.8.0
   container_name: prometheus
   ports:
    - "9090:9090"
@@ -90,22 +119,25 @@ services:
   command:
         - '--config.file=/etc/prometheus/prometheus.yml'
         - '--log.level=debug'
-  networks:
-   - vaibhavg1280
-  depends_on:
-   accounts:
-    condition: service_healthy
-   loans:
-    condition: service_healthy
-   cards:
-    condition: service_healthy
-   eurekaserver:
-    condition: service_healthy
-   configserver:
-    condition: service_healthy
+  extends:
+   file: common-config.yml
+   service: network-deploy-service
+
+ tempo:
+     image: grafana/tempo:2.9.0
+     container_name: tempo
+     command: -config.file /etc/tempo-config.yml
+     ports:
+       - "3110:3100"
+       - "4318:4318"
+     volumes:
+       - ../observability/tempo/tempo.yml:/etc/tempo-config.yml
+     extends:
+       file: common-config.yml
+       service: network-deploy-service
 
  grafana:
-  image: grafana/grafana:latest
+  image: grafana/grafana:12.3.0
   environment:
           - GF_PATHS_PROVISIONING=/etc/grafana/provisioning
           - GF_AUTH_ANONYMOUS_ENABLED=true
@@ -129,6 +161,20 @@ services:
   extends:
            file: common-config.yml
            service: network-deploy-service
+
+ backend:
+  image: grafana/loki:3.6.2
+  volumes:
+   - ../observability/loki/loki-config.yaml:/etc/loki/config.yaml
+  ports:
+               - "3100"
+               - "7946"
+  command: "-config.file=/etc/loki/config.yaml -target=backend -legacy-read-mode=false"
+  depends_on:
+               - gateway
+  extends:
+               file: common-config.yml
+               service: network-deploy-service
 
  gateway:
         image: nginx:latest
@@ -199,20 +245,24 @@ services:
         extends:
            file: common-config.yml
            service: network-deploy-service
+           
  configserver:
-  image: "vaibhavg3210/configserver:s11"
+  image: "vaibhavg3210/configserver:s12"
   container_name: configserver-ms #if not define it automatic create
   ports:
    - "8071:8071"
   healthcheck:
    test: "curl --fail --silent localhost:8071/actuator/health/readiness | grep UP || exit 1"
-   interval: 10s
+   interval: 20s
    timeout: 5s
-   retries: 10
+   retries: 20
    start_period: 10s #we use common_config
   extends:
    file: common-config.yml
    service: microservice-base-config
+  environment:
+   OTEL_SERVICE_NAME: "configserver"
+
 #  deploy:
 #   resources:
 #    limits:
@@ -220,32 +270,36 @@ services:
 #  networks:
 #   - vaibhavg1280
  eurekaserver:
-  image: "vaibhavg3210/eurekaserver:s11"
+  image: "vaibhavg3210/eurekaserver:s12"
   container_name: eurekaserver-ms #if not define it automatic create
   ports:
    - "8070:8070"
   healthcheck:
    test: "curl --fail --silent localhost:8070/actuator/health/readiness | grep UP || exit 1"
-   interval: 10s
+   interval: 20s
    timeout: 5s
-   retries: 10
+   retries: 20
    start_period: 10s #we use common_config
   extends:
    file: common-config.yml
    service: microservice-configserver-config
   environment:
     SPRING_APPLICATION_NAME: "eurekaserver"
+    OTEL_SERVICE_NAME: "eurekaserver"
 
  accounts:
-  image: "vaibhavg3210/accounts:s11"
+  image: "vaibhavg3210/accounts:s12"
   container_name: accounts-ms #if not define it automatic create
-  ports:
-   - "8080:8080"
+  depends_on:
+        configserver:
+          condition: service_healthy
+        eurekaserver:
+          condition: service_healthy
   healthcheck:
    test: "curl --fail --silent localhost:8080/actuator/health/readiness | grep UP || exit 1"
-   interval: 10s
+   interval: 20s
    timeout: 5s
-   retries: 10
+   retries: 20
    start_period: 10s #we use common_config
   environment:
    SPRING_APPLICATION_NAME: "accounts"
@@ -254,15 +308,18 @@ services:
    service: microservice-eureka-config
 
  loans:
-  image: "vaibhavg3210/loans:s11"
+  image: "vaibhavg3210/loans:s12"
   container_name: loans-ms #if not define it automatic create
-  ports:
-   - "8090:8090"
+  depends_on:
+        configserver:
+          condition: service_healthy
+        eurekaserver:
+          condition: service_healthy
   healthcheck:
    test: "curl --fail --silent localhost:8090/actuator/health/readiness | grep UP || exit 1"
-   interval: 10s
+   interval: 20s
    timeout: 5s
-   retries: 10
+   retries: 20
    start_period: 10s #we use common_config
   environment:
    SPRING_APPLICATION_NAME: "loans"
@@ -271,15 +328,18 @@ services:
    service: microservice-eureka-config
   
  cards:
-  image: "vaibhavg3210/cards:s11"
+  image: "vaibhavg3210/cards:s12"
   container_name: cards-ms #if not define it automatic create
-  ports:
-   - "9000:9000"
+  depends_on:
+        configserver:
+          condition: service_healthy
+        eurekaserver:
+          condition: service_healthy
   healthcheck:
    test: "curl --fail --silent localhost:9000/actuator/health/readiness | grep UP || exit 1"
-   interval: 10s
+   interval: 20s
    timeout: 5s
-   retries: 10
+   retries: 20
    start_period: 10s #we use common_config
   environment:
    SPRING_APPLICATION_NAME: "cards"
@@ -288,7 +348,7 @@ services:
    service: microservice-eureka-config
 
  gatewayserver:
-  image: "vaibhavg3210/gatewayserver:s11"
+  image: "vaibhavg3210/gatewayserver:s12"
   container_name: gatewayserver-ms #if not define it automatic create
   ports:
    - "8072:8072"
@@ -300,11 +360,9 @@ services:
     cards:
      condition: service_healthy
   environment:
-   SPRING_APPLICATION_NAME: "gatewayserver"
-   SPRING_DATA_REDIS_CONNECT-TIMEOUT: 2s
-   SPRING_DATA_REDIS_HOST: redis
-   SPRING_DATA_REDIS_PORT: 6379
-   SPRING_DATA_REDIS_TIMEOUT: 1s
+    SPRING_APPLICATION_NAME: "gatewayserver"
+    OTEL_SERVICE_NAME: "gatewayserver"
+    SPRING_SECURITY_OAUTH2_RESOURCESERVER_JWT_JWK-SET-URI: "http://keycloak:8080/realms/master/protocol/openid-connect/certs"
   extends:
    file: common-config.yml
    service: microservice-eureka-config
