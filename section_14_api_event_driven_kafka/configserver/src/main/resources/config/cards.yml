@@ -1,0 +1,11 @@
+build:
+ version: "3.0"
+ 
+cards:
+ message: "Welcome to Vaibhav cards related local API's"
+ contactDetails:
+  name: "Vaibhav Garg"
+  email: "Vaibhavgarg3210@gmail.com"
+ onCallSupport:
+  - (XXXXXXXXXXX)
+  - (XXXXXXXXXXX)
